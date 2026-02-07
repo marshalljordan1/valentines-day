@@ -85,7 +85,7 @@
       }
 
       #yes {
-        padding: 20px 50px;
+        padding: 16px 45px;
         background: #4caf50;
         color: white;
         font-weight: bold;
@@ -106,7 +106,7 @@
         }
 
         .yes-button-container {
-          height: 85%;
+          height: 80%;
         }
 
         #no {
@@ -119,7 +119,7 @@
         }
 
         header {
-          bottom: 20%;
+          bottom: 23%;
         }
 
         header h1 {
@@ -175,7 +175,7 @@
         if (window.innerWidth <= 430) {
           // roughly iPhone width
           x = window.innerWidth * 0.55;
-          y = window.innerHeight * 0.79; // move it lower on mobile
+          y = window.innerHeight * 0.9; // move it lower on mobile
         } else {
           x = window.innerWidth * 0.55;
           y = window.innerHeight * 0.89; // desktop default
@@ -199,7 +199,7 @@
         const dy = y - e.clientY;
 
         const distance = Math.hypot(dx, dy);
-        const safeDistance = 150;
+        const safeDistance = 100;
 
         if (distance < safeDistance) {
           const angle = Math.atan2(dy, dx);
