@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Choose Wisely</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: linear-gradient(135deg, #ff5db0, #ffe2fc);
+        background-repeat: no-repeat;
+        overflow: hidden;
+        color: red;
+        font-size: 20px;
+      }
+
+      .container {
+        text-align: center;
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .heart-container {
+        width: 100%;
+        justify-content: center;
+        top: 100px;
+        position: absolute;
+        display: flex;
+      }
+
+      .heart {
+        position: relative;
+        width: 660px;
+        height: 600px;
+        background: url(./assets/images/valentines-day-full.jpeg) center/cover
+          no-repeat;
+        background-position: 60% 25%;
+      }
+
+      header {
+        margin-bottom: 40px;
+        width: 100%;
+        position: absolute;
+        bottom: 8%;
+        padding: 10px;
+      }
+
+      button {
+        padding: 16px 32px;
+        font-size: 18px;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        position: absolute;
+      }
+
+      .yes-button-container {
+        width: 50%;
+        height: 95%;
+        display: flex;
+        justify-content: end;
+        align-items: end;
+      }
+
+      .Q {
+        display: block;
+      }
+
+      #A {
+        display: none;
+      }
+
+      #yes {
+        padding: 20px 50px;
+        background: #4caf50;
+        color: white;
+        font-weight: bold;
+        font-size: 30px;
+      }
+
+      #no {
+        background: #ff4d6d;
+        padding: 16px 32px;
+        color: white;
+      }
+
+      @media only screen and (min-device-width: 375px) and (max-device-width: 430px) and (orientation: portrait) {
+        .heart {
+          width: 400px;
+          height: 368px;
+          background-size: cover;
+        }
+
+        .yes-button-container {
+          height: 85%;
+        }
+
+        #no {
+          top: 30%;
+        }
+
+        button {
+          padding: 12px 24px;
+          font-size: 16px;
+        }
+
+        header {
+          bottom: 23%;
+        }
+
+        header h1 {
+          font-size: 40px;
+        }
+
+        header h2 {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="confetti-canvas"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      "
+    ></canvas>
+    <div class="container">
+      <div class="heart-container">
+        <div class="heart"></div>
+      </div>
+      <header>
+        <h1 class="Q">Javi, ¿quieres ser mi Valentín?</h1>
+        <h1 id="A">
+          YEEEEY! <br />
+          Que ganas tengo de un beso tuyo!
+        </h1>
+        <h2 class="Q">(Ni se te ocurra tocar el “No”, ¿eh?)</h2>
+      </header>
+      <div class="yes-button-container">
+        <button id="yes">Yes</button>
+      </div>
+      <button id="no">No</button>
+    </div>
+
+    <script>
+      const noBtn = document.getElementById("no");
+      let x = 0;
+      let y = 0;
+
+      // Function to set initial position based on viewport
+      function setNoButtonPosition() {
+        if (window.innerWidth <= 430) {
+          // roughly iPhone width
+          x = window.innerWidth * 0.55;
+          y = window.innerHeight * 0.79; // move it lower on mobile
+        } else {
+          x = window.innerWidth * 0.55;
+          y = window.innerHeight * 0.89; // desktop default
+        }
+
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+        noBtn.style.position = "absolute";
+      }
+
+      // Initial call
+      setNoButtonPosition();
+
+      // Recalculate on resize
+      window.addEventListener("resize", () => {
+        if (!isFree) setNoButtonPosition(); // only if No hasn’t started moving
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        const dx = x - e.clientX;
+        const dy = y - e.clientY;
+
+        const distance = Math.hypot(dx, dy);
+        const safeDistance = 150;
+
+        if (distance < safeDistance) {
+          const angle = Math.atan2(dy, dx);
+          const moveAmount = (safeDistance - distance) / 10;
+
+          x += Math.cos(angle) * moveAmount;
+          y += Math.sin(angle) * moveAmount;
+
+          // Keep inside viewport
+          const btnRect = noBtn.getBoundingClientRect();
+          x = Math.max(5, Math.min(window.innerWidth - btnRect.width - 5, x));
+          y = Math.max(5, Math.min(window.innerHeight - btnRect.height - 5, y));
+
+          noBtn.style.left = x + "px";
+          noBtn.style.top = y + "px";
+        }
+      });
+
+      // Mobile support
+      document.addEventListener("touchstart", (e) => {
+        const touch = e.touches[0];
+
+        const dx = x - touch.clientX;
+        const dy = y - touch.clientY;
+
+        const angle = Math.atan2(dy, dx);
+
+        const jumpDistance = 100;
+
+        x += Math.cos(angle) * jumpDistance;
+        y += Math.sin(angle) * jumpDistance;
+
+        const btnRect = noBtn.getBoundingClientRect();
+
+        x = Math.max(5, Math.min(window.innerWidth - btnRect.width - 5, x));
+        y = Math.max(5, Math.min(window.innerHeight - btnRect.height - 5, y));
+
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+      });
+
+      document.getElementById("yes").addEventListener("click", () => {
+        const heart = document.getElementsByClassName("heart")[0];
+        heart.style.background =
+          "url(./assets/images/valentines-day.jpeg) center/cover";
+        console.log(heart.style);
+        confetti = createConfetti(200);
+        drawConfetti();
+
+        setTimeout(() => {
+          confetti = [];
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }, 20000);
+      });
+
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      window.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      function random(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      // Corazones confeti
+      function createConfetti(count = 100) {
+        const colors = ["#ff4d6d", "#ff85a2", "#ffb6c1", "#ffc0cb"];
+        const confetti = [];
+        for (let i = 0; i < count; i++) {
+          confetti.push({
+            x: random(0, canvas.width),
+            y: random(-canvas.height, 0),
+            size: random(15, 25),
+            color: colors[Math.floor(random(0, colors.length))],
+            speed: random(2, 3),
+            tilt: random(-10, 10),
+          });
+        }
+        return confetti;
+      }
+
+      let confetti = [];
+
+      function drawConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let c of confetti) {
+          ctx.fillStyle = c.color;
+          ctx.font = `${c.size}px sans-serif`;
+          ctx.fillText("🖤", c.x + c.tilt, c.y);
+
+          c.y += c.speed;
+          c.tilt += 0.1;
+
+          if (c.y > canvas.height) {
+            c.y = random(-20, 0);
+            c.x = random(0, canvas.width);
+            c.tilt = random(-10, 10);
+          }
+        }
+        requestAnimationFrame(drawConfetti);
+      }
+
+      // Activar al hacer clic en "Sí"
+      document.getElementById("yes").addEventListener("click", () => {
+        const heart = document.querySelector(".heart");
+        heart.style.background =
+          "url(./assets/images/tattoos.jpeg) center/cover";
+        const Q = document.getElementsByClassName("Q");
+        for (let i = 0; i < Q.length; i++) {
+          Q[i].style.display = "none";
+        }
+
+        // Show the answer
+        const A = document.getElementById("A");
+        A.style.display = "block";
+
+        const yes = document.getElementById("yes");
+        yes.style.display = "none";
+        noBtn.style.display = "none";
+
+        confetti = createConfetti(150);
+        drawConfetti();
+
+        setTimeout(() => {
+          confetti = [];
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }, 20000);
+      });
+    </script>
+  </body>
+</html>
